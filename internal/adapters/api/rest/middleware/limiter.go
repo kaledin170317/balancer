@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"balancer/internal/adapters/api/rest/erros"
 	"balancer/internal/logger"
 	"balancer/internal/ratelimit"
 	"net/http"
@@ -16,8 +17,7 @@ func Middleware(limiter *ratelimit.Limiter) func(http.Handler) http.Handler {
 
 			if !limiter.Allow(clientID) {
 				logger.Warn(r.Context(), "rate limit exceeded", "clientID", clientID)
-				w.WriteHeader(http.StatusTooManyRequests)
-				w.Write([]byte(`{"code":429,"message":"Rate limit exceeded"}`))
+				erros.JSON(w, http.StatusTooManyRequests, "Rate limit exceeded")
 				return
 			}
 

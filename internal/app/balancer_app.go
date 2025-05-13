@@ -3,10 +3,10 @@ package app
 import (
 	"balancer/internal/adapters/api/rest/controllers"
 	"balancer/internal/adapters/api/rest/middleware"
+	"balancer/internal/adapters/api/rest/proxy"
 	"balancer/internal/adapters/db/postgreSQL"
 	"balancer/internal/balancer"
 	"balancer/internal/balancer/cheker"
-	"balancer/internal/balancer/proxy"
 	"balancer/internal/config"
 	"balancer/internal/domain/models"
 	"balancer/internal/domain/usecases"
@@ -75,7 +75,7 @@ func Run() {
 
 	clientCtrl := controllers.NewClientController(clientUC)
 	r.Mount("/clients", clientCtrl.Routes())
-	r.Handle("/*", proxy.NewHandler(bal))
+	r.Handle("/*", proxy.NewBalancer(bal))
 
 	srv := &http.Server{
 		Addr:    cfg.ListenAddr,

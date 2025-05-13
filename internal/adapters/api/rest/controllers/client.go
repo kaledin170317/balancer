@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"balancer/internal/adapters/api/rest/erros"
 	"balancer/internal/domain/models"
 	"balancer/internal/domain/usecases"
 	"balancer/internal/logger"
@@ -49,7 +50,7 @@ func (c *ClientController) create(w http.ResponseWriter, r *http.Request) {
 	var req CreateClientRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		logger.Error(ctx, "invalid request body", "err", err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		erros.JSON(w, http.StatusBadRequest, "Invalid request body")
 		return
 	}
 
@@ -62,12 +63,12 @@ func (c *ClientController) create(w http.ResponseWriter, r *http.Request) {
 	created, err := c.usecase.Create(ctx, client)
 	if err != nil {
 		logger.Error(ctx, "failed to create client", "err", err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		erros.JSON(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	logger.Info(ctx, "client created", "id", created.ID)
-	json.NewEncoder(w).Encode(toClientResponse(created))
+	_ = json.NewEncoder(w).Encode(toClientResponse(created))
 }
 
 func (c *ClientController) get(w http.ResponseWriter, r *http.Request) {
@@ -79,12 +80,12 @@ func (c *ClientController) get(w http.ResponseWriter, r *http.Request) {
 	client, err := c.usecase.Get(ctx, id)
 	if err != nil {
 		logger.Error(ctx, "client not found", "id", id, "err", err)
-		http.Error(w, err.Error(), http.StatusNotFound)
+		erros.JSON(w, http.StatusNotFound, "Client not found")
 		return
 	}
 
 	logger.Info(ctx, "client retrieved", "id", id)
-	json.NewEncoder(w).Encode(toClientResponse(client))
+	_ = json.NewEncoder(w).Encode(toClientResponse(client))
 }
 
 func (c *ClientController) update(w http.ResponseWriter, r *http.Request) {
@@ -96,7 +97,7 @@ func (c *ClientController) update(w http.ResponseWriter, r *http.Request) {
 	var req CreateClientRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		logger.Error(ctx, "invalid update body", "err", err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		erros.JSON(w, http.StatusBadRequest, "Invalid request body")
 		return
 	}
 
@@ -108,12 +109,12 @@ func (c *ClientController) update(w http.ResponseWriter, r *http.Request) {
 
 	if err := c.usecase.Update(ctx, client); err != nil {
 		logger.Error(ctx, "failed to update client", "id", id, "err", err)
-		http.Error(w, err.Error(), http.StatusNotFound)
+		erros.JSON(w, http.StatusNotFound, err.Error())
 		return
 	}
 
 	logger.Info(ctx, "client updated", "id", id)
-	json.NewEncoder(w).Encode(toClientResponse(client))
+	_ = json.NewEncoder(w).Encode(toClientResponse(client))
 }
 
 func (c *ClientController) delete(w http.ResponseWriter, r *http.Request) {
@@ -124,7 +125,7 @@ func (c *ClientController) delete(w http.ResponseWriter, r *http.Request) {
 
 	if err := c.usecase.Delete(ctx, id); err != nil {
 		logger.Error(ctx, "failed to delete client", "id", id, "err", err)
-		http.Error(w, err.Error(), http.StatusNotFound)
+		erros.JSON(w, http.StatusNotFound, err.Error())
 		return
 	}
 
@@ -139,7 +140,7 @@ func (c *ClientController) list(w http.ResponseWriter, r *http.Request) {
 	clients, err := c.usecase.List(ctx)
 	if err != nil {
 		logger.Error(ctx, "failed to list clients", "err", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		erros.JSON(w, http.StatusInternalServerError, "Failed to fetch client list")
 		return
 	}
 
@@ -149,7 +150,7 @@ func (c *ClientController) list(w http.ResponseWriter, r *http.Request) {
 	}
 
 	logger.Info(ctx, "clients listed", "count", len(result))
-	json.NewEncoder(w).Encode(result)
+	_ = json.NewEncoder(w).Encode(result)
 }
 
 func toClientResponse(c *models.Client) ClientResponse {
