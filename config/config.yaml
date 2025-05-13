@@ -1,0 +1,13 @@
+listen_addr: ":8080"
+backends:
+  - https://httpbin.org/get
+algorithm: round-robin
+rate_limit:
+  capacity: 100
+  refill_rate: 10
+
+health_check:
+  interval: 5s
+  timeout: 2s
+
+database_dsn: postgres://postgres:password@localhost:5432/balancer?sslmode=disable
