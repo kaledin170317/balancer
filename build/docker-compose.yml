@@ -47,5 +47,3 @@ volumes:
 
 networks:
   internal:
-
-
