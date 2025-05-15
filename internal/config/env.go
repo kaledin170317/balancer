@@ -11,7 +11,7 @@ func LoadFromEnv() (*Config, error) {
 	var cfg Config
 	cfg.ListenAddr = get("LISTEN_ADDR", ":8080")
 	cfg.Algorithm = get("ALGORITHM", "round-robin")
-	cfg.Backends = strings.Split(get("BACKENDS", "https://httpbin.org/get"), ",")
+	cfg.Backends = strings.Split(get("BACKENDS", "t"), ",")
 	if len(cfg.Backends) == 1 && cfg.Backends[0] == "" {
 		cfg.Backends = nil
 	}

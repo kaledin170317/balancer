@@ -20,9 +20,30 @@ services:
     volumes:
       - ../migrations/0001_init.up.sql:/docker-entrypoint-initdb.d/init.sql
 
+  balancer:
+    build:
+      context: ..
+      dockerfile: build/Dockerfile
+    container_name: balancer-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    networks:
+      - internal
+    environment:
+      DB_DSN: postgres://postgres:password@postgres:5432/balancer?sslmode=disable
+      LISTEN_ADDR: ":8080"
+      BACKENDS: https://httpbin.org/ge,http://azino.ru
+      ALGORITHM: round-robin
+      RATE_CAPACITY: "100"
+      RATE_REFILL: "10"
+      HC_INTERVAL: 5s
+      HC_TIMEOUT: 2s
 
 volumes:
   pgdata:
-
+Ы
 networks:
   internal:
