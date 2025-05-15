@@ -11,7 +11,7 @@ cd balancer
 # Перейти в папку с Docker-файлами
 cd build
 
-# Поднять всю инфраструктуру
+# Поднять всe
 docker-compose up --build
 ```
 
